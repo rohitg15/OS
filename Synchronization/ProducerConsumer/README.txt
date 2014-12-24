@@ -1,0 +1,3 @@
+Problem - This is the classic producer-consumer problem. We have a set of Producers, who keep writing values into a shared buffer. The consumers read the values from the shared buffer and display them. We use threads to represent both producers and consumers.
+
+Solution - Use 2 semaphores for the 2 corner cases of the buffer - Full and Empty. Producers wait on Full Buffers and Consumers wait on Empty Buffers. We use a Mutex to ensure that modifications to the shared buffer are performed in a critical section.

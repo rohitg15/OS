@@ -1,0 +1,3 @@
+The problem statement is as follows : Create 2 threads to alternatively print odd and even numbers upto MAXSIZE
+
+Solution : Let the 2 threads be odd_thread and even_thread. We use 2 semaphores , The first one to indicate the odd_thread's turn and the second one to indicate the even_thread's turn. We start with the even_thread by initializing the corresponding semaphore to 1. Ever thread wait's for its own turn, prints the corresponding value (odd/even), updates the current_index and signals the semaphore on which the other thread is waiting.

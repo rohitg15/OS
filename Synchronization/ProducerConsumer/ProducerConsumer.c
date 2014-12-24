@@ -101,6 +101,8 @@ int main(int argc,char* argv[])
 	pthread_t producer_thread_array[PRODUCER_NUMTHREADS],consumer_thread_array[CONSUMER_NUMTHREADS];
 	
 
+	initialize();
+
 	int i=0;
 
 	memset(shared_buffer,0,MAXSIZE*sizeof(int));
