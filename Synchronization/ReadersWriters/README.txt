@@ -1,0 +1,5 @@
+PROBLEM :
+
+Readers-Writers problem -  this is a famous problem elucidating various concepts of concurrent programming. we assume that there are m readers who are attempting to read a resource, and n writers who are attempting to write into a resource concurrently. we must ensure that multiple readers can read at the same time without interference from one another, but writes happen exclusively. The first two versions of the problem, starve either the readers or the writers. In this version (third version), the objective is to eliminate starving.
+
+SOLUTION :   We represent readers and writers using threads and use 2 semaphores and 1 mutex. the 1st sempahore is for ordering threads by arrival, in order to prevent starvation. The second is to ensure exclusive access. The mutex is for updating the number of readers currently reading.
