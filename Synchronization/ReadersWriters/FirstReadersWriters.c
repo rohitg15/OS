@@ -74,16 +74,14 @@ void* writer(void *data)
 {
   sem_wait(&sem_write_access);
 
-  pthread_mutex_lock(&read_count_mutex);
 
   //write to the shared the variable
 
   shared_data = (int)data;
   
-  printf("writing to data : %d\n",shared_data);
 
-  pthread_mutex_unlock(&read_count_mutex);
   sem_post(&sem_write_access);
+  printf("writing to data : %d\n",shared_data);
 
 }
 
