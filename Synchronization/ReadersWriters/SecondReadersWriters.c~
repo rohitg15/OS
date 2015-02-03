@@ -20,7 +20,7 @@ sem_t read_ready;
 void initialize()
 {
   pthread_mutex_init(&mutex_write,0);
-  //  pthread_mutex_init(&mutex_read,0);
+  pthread_mutex_init(&mutex_read,0);
   pthread_mutex_init(&mutex_write_count,0);
   pthread_mutex_init(&mutex_read_count,0);
 
@@ -31,27 +31,28 @@ void initialize()
 
 void* reader(void *data)
 {
+
   //acquire a lock to update the read count
-  pthread_mutex_lock(&mutex_read_count);
+  pthread_mutex_lock(&read_count);
   read_count++;
   if (read_count == 1)
     {
       // the first reader has arrived, check if the reader is allowed to read
       sem_wait(&read_ready);
     }
-  pthread_mutex_unlock(&mutex_read_count);
+  pthread_mutex_unlock(&read_count);
   
   //Read the value here.
-  printf("reading  - shared data is : %d\n",shared_data);
+  printf("shared data is : %d\n",shared_data);
 
-  pthread_mutex_lock(&mutex_read_count);
+  pthread_mutex_lock(&read_count);
   read_count--;
   if (read_count == 0)
     {
       // if all readers are done
       sem_post(&read_ready);
     }
-  pthread_mutex_unlock(&mutex_read_count);
+  pthread_mutex_unlock(&read_count);
   
 }
 
@@ -78,8 +79,6 @@ void* writer(void *data)
   //do actual write operations here
 
   shared_data = (int)data;
-
-  printf("updated shared data : %d\n",shared_data);
   
   //release write mutex here
   pthread_mutex_unlock(&mutex_write);
@@ -99,6 +98,7 @@ void* writer(void *data)
 
 int main(int argc,char *argv[])
 {
+
   if (argc != 3)
     {
       fprintf(stderr,"Error : incorrect format. use <executable> number_of_readers number_of_writers");
@@ -109,10 +109,6 @@ int main(int argc,char *argv[])
 
   int reader_num = atoi(argv[1]);
   int writer_num = atoi(argv[2]);
-
-  reader_num = (reader_num < (MAX_THREADS>>1)) ? reader_num : MAX_THREADS>>1 ;
-  writer_num = (writer_num < (MAX_THREADS>>1)) ? writer_num : MAX_THREADS>> 1;
-
   int i = 0;
   /*
     create reader and writer threads
