@@ -48,6 +48,10 @@ void* reader(void *data)
 	}
 
 	pthread_mutex_unlock(&mutex_readcount);	//release the lock for updating readcount
+	/*
+	  allow other readers/writers to perform their job now by signalling the access semaphore
+        */
+	sem_post(&sem_access);
 
 	//read the resource here . there may be multiple readers here
 	printf("reading shared var : %d\n",shared_var);
@@ -60,18 +64,13 @@ void* reader(void *data)
 		sem_post(&sem_readers_done);
 	}
 	pthread_mutex_unlock(&mutex_readcount);
-	/*
-	  allow other readers/writers to perform their job now by signalling the access semaphore
-	 */
-	sem_post(&sem_access);
 
 }	
 
 
 void* writer(void *data)
 {
-       
-
+  
 	sem_wait(&sem_access);	//obtain access for the current thread
 	sem_wait(&sem_readers_done); // ensure that there are no readers reading the shared resource now
 	
