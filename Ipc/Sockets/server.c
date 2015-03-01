@@ -13,9 +13,9 @@
 int main(int argc,char *argv[])
 {
 
-  if (argc != 3)
+  if (argc != 2)
     {
-      fprintf(stderr,"ERROR: usage %s ipaddress port_number\n",argv[0]);
+      fprintf(stderr,"ERROR: usage %s port_number\n",argv[0]);
       exit(0);
     }
 
@@ -27,8 +27,8 @@ int main(int argc,char *argv[])
     which refers to the address
    */
   server_addr.sin_family = AF_INET;
-  server_addr.sin_port = htons(atoi(argv[2]));
-  server_addr.sin_addr.s_addr = htonl(argv[1]);
+  server_addr.sin_port = htons(atoi(argv[1]));
+  server_addr.sin_addr.s_addr = INADDR_ANY;
 
   /*
     create a socket with
@@ -56,28 +56,52 @@ int main(int argc,char *argv[])
 
   // start listening for connections
   listen(server_fd,1024);
-  
   socklen_t client_len = sizeof(client_addr);
-  // start accepting connections
-  client_fd = accept(server_fd,(struct sockaddr *)&client_addr,&client_len);
-  if (client_fd == -1)
-    {
-      fprintf(stderr,"failed with error : %d unable to accept connections\n",strerror(errno));
-      close(server_fd);
-      exit(0);
+      
+  while(1)
+    { 
+      // start accepting connections
+      client_fd = accept(server_fd,(struct sockaddr *)&client_addr,&client_len);
+      
+      if (client_fd == -1)
+	{
+	  fprintf(stderr,"failed with error : %d unable to accept connections\n",strerror(errno));
+	  close(server_fd);
+	  exit(0);
+	}
+      
+      
+      pid_t process_id = fork();
+      
+      //close the client's file descriptor on the server
+      if (process_id)
+	{
+	  // we are inside the server
+	  printf("inside the main server. pid = %d. closing the client's fd.\n",getpid());
+	  close(client_fd);
+	}
+      else
+	{
+	  // we are in the child process
+	  // child has to close its copy of server_fd
+	  close(server_fd);
+	  pid_t pid = getpid();// this is the thread group id
+	  const char *msg = "Hello World! from server";
+	  char buf[64];
+	  memset(buf,0,sizeof(buf));
+	  int len = strlen(msg);
+	  sprintf(buf,"%s. Server process id is %d",msg,pid);
+
+	  write(client_fd,buf,strlen(buf));
+	  memset(buf,0,sizeof(buf));
+	  read(client_fd,buf,sizeof(buf));
+  
+	  printf("received : %s from client\n",buf);
+	  close(client_fd);
+	}
+          
+      
     }
-
-  const char *msg = "Hello World! from server";
-  char buf[64];
-  memset(buf,0,sizeof(buf));
-  int len = strlen(msg);
-
-  write(client_fd,msg,len);
-  read(client_fd,buf,sizeof(buf));
-  
-  printf("received : %s from client\n",buf);
-  
-  close(client_fd);
   close(server_fd);
 
 
