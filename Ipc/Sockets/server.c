@@ -8,7 +8,7 @@
 #include<string.h>
 
 
-#define FOR(i,x,n) for(i=x;i<n;i++
+#define FOR(i,x,n) for(i=x;i<n;i++)
 
 int main(int argc,char *argv[])
 {
