@@ -1,2 +1,0 @@
-/home/morpheus/Documents/kernel/device_drivers/char_drivers/first_char_driver/my_test_char_driver.ko
-/home/morpheus/Documents/kernel/device_drivers/char_drivers/first_char_driver/my_test_char_driver.o

@@ -164,4 +164,3 @@ static void driver_exit_fn(void)
 // tell the kernel where to start and stop
 module_init(driver_entry_fn);
 module_exit(driver_exit_fn);
-MODULE_LICENSE("GPL");
