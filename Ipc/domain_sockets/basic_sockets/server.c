@@ -22,7 +22,7 @@ void handle(int conn_fd)
     if (nbytes < 0)
     {
         fprintf(stderr, "Error handling connection: %s", strerror(errno));
-        goto cleanup;
+        goto close_socket;
     }
     buf[nbytes] = 0x0;
     
@@ -32,9 +32,9 @@ void handle(int conn_fd)
     if (write(conn_fd, buf, strlen(buf)) < 0)
     {
         fprintf(stderr, "Error handling connection: %s", strerror(errno));
-        goto cleanup;
+        goto close_socket;
     }
-cleanup:
+close_socket:
     close(conn_fd);
 }
 
